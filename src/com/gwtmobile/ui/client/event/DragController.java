@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2010 Zhihua (Dennis) Jiang
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -47,15 +47,15 @@ public abstract class DragController implements EventListener {
 	private Point _lastDragPos = new Point(0, 0);
 	private long _currDragTimeStamp = 0;
 	private Point _currDragPos = new Point(0, 0);
-	
+
 	private JavaScriptObject _clickListener;
     protected JavaScriptObject _dragStartListener;
     protected JavaScriptObject _dragMoveListener;
     protected JavaScriptObject _dragEndListener;
 
-	private static DragController INSTANCE = Beans.isDesignTime() ? 
+	private static DragController INSTANCE = Beans.isDesignTime() ?
 			new DragControllerDesktop() : 	(DragController)GWT.create(DragController.class);
-	
+
 	DragController() {
 	    Utils.Console("New DragController instance created");
 	    init();
@@ -64,7 +64,7 @@ public abstract class DragController implements EventListener {
     public static DragController get() {
         return INSTANCE;
     }
-    
+
 	protected void init() {
 	    _source = RootLayoutPanel.get();
         registerEvents();
@@ -73,19 +73,19 @@ public abstract class DragController implements EventListener {
     public void addDragEventsHandler(DragEventsHandler dragHandler) {
         _dragEventHandlers.add(dragHandler);
 	}
-	
+
 	public void addSwipeEventsHandler(SwipeEventsHandler swipeHandler) {
         _swipeEventHandlers.add(swipeHandler);
 	}
-	
+
     public void removeDragEventsHandler(DragEventsHandler dragHandler) {
         _dragEventHandlers.remove(dragHandler);
     }
 
     public void removeSwipeEventHandler(SwipeEventsHandler swipeHandler) {
         _swipeEventHandlers.remove(swipeHandler);
-    }   
-	
+    }
+
 	@Override
     public void onBrowserEvent(Event e) {
         String type = e.getType();
@@ -93,7 +93,7 @@ public abstract class DragController implements EventListener {
             onClick(e);
         }
 	}
-	
+
     private void onClick(Event e) {
         if (_suppressNextClick || Page.isInTransition()) {
             e.stopPropagation();
@@ -101,23 +101,23 @@ public abstract class DragController implements EventListener {
             Utils.Console("click suppressed");
         }
     }
- 
+
 	//TODO: May need an onPreStart event to indicate that mouse is down, but no movement yet,
-	//      so onStart event can actually mean drag is indeed started.	
+	//      so onStart event can actually mean drag is indeed started.
     protected void onStart(Event e, Point p) {
         _isDown = true;
         _suppressNextClick = false;
         Date currentDateTime = new Date();
         _lastDragTimeStamp = currentDateTime.getTime();
-        _currDragTimeStamp = _lastDragTimeStamp; 
+        _currDragTimeStamp = _lastDragTimeStamp;
         _lastDragPos.clone(p);
         _currDragPos.clone(p);
-        DragEvent dragEvent = new DragEvent(e, DragEvent.Type.Start, 
-                p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());          
+        DragEvent dragEvent = new DragEvent(e, DragEvent.Type.Start,
+                p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());
         fireDragEvent(dragEvent);
-        
+
     }
-	
+
     protected void onMove(Event e, Point p) {
         if (_isDown) {
             if (p.equals(_currDragPos)) {
@@ -125,27 +125,27 @@ public abstract class DragController implements EventListener {
                 return;
             }
             _suppressNextClick = true;
-            DragEvent dragEvent = new DragEvent(e, DragEvent.Type.Move, 
-                    p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());          
+            DragEvent dragEvent = new DragEvent(e, DragEvent.Type.Move,
+                    p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());
             fireDragEvent(dragEvent);
             _lastDragPos.clone(_currDragPos);
             _lastDragTimeStamp = _currDragTimeStamp;
             _currDragPos.clone(p);
             Date currentDateTime = new Date();
-            _currDragTimeStamp = currentDateTime.getTime();            
+            _currDragTimeStamp = currentDateTime.getTime();
         }
     }
-    
+
     protected void onEnd(Event e, Point p) {
         if (_isDown) {
             _isDown = false;
-            DragEvent dragEvent = new DragEvent(e, DragEvent.Type.End, 
-                    p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());          
+            DragEvent dragEvent = new DragEvent(e, DragEvent.Type.End,
+                    p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());
             fireDragEvent(dragEvent);
             double distanceX = p.X() - _lastDragPos.X();
             double distanceY = p.Y() - _lastDragPos.Y();
             double distance;
-            SwipeEvent.Type swipeType; 
+            SwipeEvent.Type swipeType;
             if (Math.abs(distanceX) > Math.abs(distanceY)) {
             	distance = distanceX;
             	swipeType = SwipeEvent.Type.Horizontal;
@@ -170,34 +170,35 @@ public abstract class DragController implements EventListener {
             }
         }
     }
-    
-    protected void fireDragEvent(DragEvent e) {
-    	if (_capturingDragEventsHandler != null) {
-    		e.dispatch(_capturingDragEventsHandler);
-    		return;
-    	}
-        EventTarget target = e.getNativeEvent().getEventTarget();
-        Node node = Node.as(target);        
-        if (!Element.is(node)) {
-        	node = node.getParentNode();	//Text node
-        }
-        if (Element.is(node)) {
-             Element ele = Element.as(target);
-            int count = 0;
-            while (ele != null) {
-                for (DragEventsHandler handler : _dragEventHandlers) {
-                    if (ele.equals(handler.getElement())) {
-                        e.dispatch(handler);
-                        count++;
-                        if (e.getStopPropagation() || count == _dragEventHandlers.size()) {
-                            return;
-                        }
-                    }
-                }
-                ele = ele.getParentElement();
-            }
-        }
-    }
+
+	protected void fireDragEvent(DragEvent e) {
+		if (_capturingDragEventsHandler != null) {
+			e.dispatch(_capturingDragEventsHandler);
+			return;
+		}
+		EventTarget target = e.getNativeEvent().getEventTarget();
+		Node node = Node.as(target);
+		if (!Element.is(node)) {
+			node = node.getParentNode(); // Text node
+		}
+		if (Element.is(node)) {
+			Element ele = Element.as(target);
+			int count = 0;
+			while (ele != null) {
+				for (DragEventsHandler handler : _dragEventHandlers) {
+					if (ele.equals(handler.getElement())) {
+						e.dispatch(handler);
+						count++;
+						if (e.getStopPropagation()
+								|| count == _dragEventHandlers.size()) {
+							return;
+						}
+					}
+				}
+				ele = ele.getParentElement();
+			}
+		}
+	}
 
     protected void fireSwipeEvent(SwipeEvent e) {
     	if (_capturingSwipeEventsHandler != null) {
@@ -208,7 +209,7 @@ public abstract class DragController implements EventListener {
     		return;
     	}
         EventTarget target = e.getNativeEvent().getEventTarget();
-        Node node = Node.as(target);        
+        Node node = Node.as(target);
         if (!Element.is(node)) {
         	node = node.getParentNode();	//Text node
         }
@@ -239,7 +240,7 @@ public abstract class DragController implements EventListener {
             _clickListener = Utils.addEventListener(_source.getElement(), "click", true, this);
         }
     }
-    
+
     protected void unregisterEvents() {
         if (_clickListener != null) {
             Utils.removeEventListener(_source.getElement(), "click", true, _clickListener);
@@ -256,7 +257,7 @@ public abstract class DragController implements EventListener {
         registerEvents();
         Utils.Console("drag events resumed.");
     }
-    
+
     public boolean captureDragEvents(DragEventsHandler cachingHandler) {
     	if (_capturingDragEventsHandler != null) {
     		return false;
@@ -264,7 +265,7 @@ public abstract class DragController implements EventListener {
     	_capturingDragEventsHandler = cachingHandler;
     	return true;
     }
-    
+
     public boolean releaseDragCapture(DragEventsHandler cachingHandler) {
     	if (_capturingDragEventsHandler == null) {
     		return true;
@@ -275,7 +276,7 @@ public abstract class DragController implements EventListener {
     	_capturingDragEventsHandler = null;
     	return true;
     }
-    
+
     public boolean captureSwipeEvents(SwipeEventsHandler cachingHandler) {
     	if (_capturingSwipeEventsHandler != null) {
     		return false;
@@ -283,7 +284,7 @@ public abstract class DragController implements EventListener {
     	_capturingSwipeEventsHandler = cachingHandler;
     	return true;
     }
-    
+
     public boolean releaseSwipeCapture(SwipeEventsHandler cachingHandler) {
     	if (_capturingSwipeEventsHandler == null) {
     		return true;
@@ -294,6 +295,6 @@ public abstract class DragController implements EventListener {
     	_capturingSwipeEventsHandler = null;
     	return true;
     }
-    
+
 
 }

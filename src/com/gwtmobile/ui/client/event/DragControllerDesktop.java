@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2010 Zhihua (Dennis) Jiang
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,6 +15,7 @@
  */
 
 package com.gwtmobile.ui.client.event;
+
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;
@@ -26,7 +27,7 @@ public class DragControllerDesktop extends DragController {
 
     DragControllerDesktop() {
     }
-    
+
     @Override
     protected void registerEvents() {
         super.registerEvents();
@@ -36,7 +37,7 @@ public class DragControllerDesktop extends DragController {
             _dragEndListener = Utils.addEventListener(_source.getElement(), "mouseup", true, this);
         }
     }
-    
+
     @Override
     protected void unregisterEvents() {
         super.unregisterEvents();
@@ -48,37 +49,38 @@ public class DragControllerDesktop extends DragController {
         }
     }
 
-    
+
 	public void onMouseDown(Event e) {
+
         EventTarget target = e.getEventTarget();
         boolean preventDefault = true;
         if (Element.is(target)) {
             Element ele = Element.as(target);
-            //INPUT element will not get focus if default action is prevented.            
+            //INPUT element will not get focus if default action is prevented.
             if (Utils.isHtmlFormControl(ele)) {
                 ele.focus();
                 preventDefault = false;
             }
         }
         if (preventDefault) {
-            e.preventDefault();   //prevent default action of selecting text            
+            e.preventDefault();   //prevent default action of selecting text
             e.stopPropagation();
     		onStart(e, new Point(e.getClientX(), e.getClientY()));
         }
 	}
-	
+
     public void onMouseMove(Event e) {
 		e.preventDefault();
 		e.stopPropagation();
         onMove(e, new Point(e.getClientX(), e.getClientY()));
 	}
-	
+
 	public void onMouseUp(Event e) {
 		e.preventDefault();
 		e.stopPropagation();
         onEnd(e, new Point(e.getClientX(), e.getClientY()));
 	}
-	
+
 	@Override
     public void onBrowserEvent(Event e) {
 		String type = e.getType();

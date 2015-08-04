@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2010 Zhihua (Dennis) Jiang
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -37,17 +37,31 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
 	private ShowArrow _showArrow;
 	private int _selected = -1;
 	private boolean _selectable = true;
-	
-    public ListPanel() { 
+	private double _initialX = 0.0;
+	private double _initialY = 0.0;
+
+    public ListPanel() {
         addDomHandler(this, ClickEvent.getType());
+
         setStyleName(Primary.ListPanel);
     }
-    
+
     @Override
     protected String getDesignTimeMessage() {
     	return "Add ListItems (recommended) or other widgets to the panel.";
     }
 
+    @Override
+    protected void onAttach() {
+    	super.onAttach();
+        DragController.get().addDragEventsHandler(this);
+    }
+
+    @Override
+    protected void onDetach() {
+    	DragController.get().removeDragEventsHandler(this);
+    	super.onDetach();
+    }
 
     public HandlerRegistration addSelectionChangedHandler(SelectionChangedHandler handler) {
         return this.addHandler(handler, SelectionChangedEvent.TYPE);
@@ -56,12 +70,10 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     @Override
     public void onLoad() {
         super.onLoad();
-        DragController.get().addDragEventsHandler(this);
     }
-    
+
     @Override
     public void onUnload() {
-        DragController.get().removeDragEventsHandler(this);
     }
 
     @Override
@@ -71,7 +83,7 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     	}
     	else {
         	ListItem listItem = new ListItem();
-        	super.add(listItem);    	
+        	super.add(listItem);
         	listItem.add(w);
         	if (_showArrow == ShowArrow.Visible) {
 	        	Chevron chevron = new Chevron();
@@ -82,18 +94,22 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
 
     @Override
     public void onClick(ClickEvent e) {
-        if (_selected >= 0) {
-    		ListItem item = (ListItem) getWidget(_selected);
-    		if (item.isEnabled()) {
-	            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected, 
-	            	e.getNativeEvent().getEventTarget());
-	            this.fireEvent(selectionChangedEvent);
-	        	item.removeStyleName(Secondary.Pressed);
-    		}
-    		_selected = -1;
-        }
+		//Utils.Console("Clicking List #" +_selected);
+    	// samsuns on 5.0.1 does not get click events for this control.
+    	// so I moved the behavior to the drag end.
+//        if (_selected >= 0) {
+//    		ListItem item = (ListItem) getWidget(_selected);
+//    		if (item.isEnabled()) {
+//	            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected,
+//	            	e.getNativeEvent().getEventTarget());
+//	            this.fireEvent(selectionChangedEvent);
+//	            Utils.Console("Firing selection event");
+//	        	item.removeStyleName(Secondary.Pressed);
+//    		}
+//    		_selected = -1;
+//        }
     }
-    
+
     public void setDisplayArrow(ShowArrow show) {
     	_showArrow = show;
     	for (int i = 0; i < getWidgetCount(); i++) {
@@ -101,28 +117,31 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
 			listItem.setDisplayArrowFromParent(show);
 		}
     }
-    
+
     public ShowArrow getDisplayArrow() {
     	return _showArrow;
     }
-    
+
     public void isSelectable(boolean selectable) {
     	this._selectable  = selectable;
     }
-    
+
     public void setSelectable(boolean selectable) {
     	this._selectable  = selectable;
     }
-    
+
     public boolean getSelectable() {
     	return _selectable;
     }
-    
+
     @Override
     public void onDragStart(DragEvent e) {
     	if (_selectable) {
 	    	_selected = Utils.getTargetItemIndex(getElement(), e.getNativeEvent().getEventTarget());
 	    	if (_selected >= 0) {
+	    		//Utils.Console("drag start selected item #" +_selected);
+	    		_initialX = e.X;
+	    		_initialY = e.Y;
 	    		new Timer() {
 					@Override
 					public void run() {
@@ -142,23 +161,59 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     public void onDragMove(DragEvent e) {
     	if (_selected >= 0) {
         	getWidget(_selected).removeStyleName(Secondary.Pressed);
-    		_selected = -1;
+        	if (_selected >= 0 && Math.abs(e.X - _initialX) > 40 && Math.abs(e.Y - _initialY) > 40) {
+        		// we are scrolling or swiping, so no selection
+    	    		//Utils.Console("drag move deselected item #" +_selected +" due to move");
+    	    		new Timer() {
+    					@Override
+    					public void run() {
+    				    	if (_selected >= 0) {
+    				    		ListItem item = (ListItem) getWidget(_selected);
+    				    		if (item.isEnabled()) {
+    					        	getWidget(_selected).addStyleName(Secondary.Pressed);
+    				    		}
+    				    	}
+    					}
+    				}.schedule(75);
+        		_selected = -1;
+        	}
     	}
     }
 
     @Override
     public void onDragEnd(DragEvent e) {
-    	if (_selected >= 0) {
+    	if (_selected >= 0 && Math.abs(e.X - _initialX) < 40 && Math.abs(e.Y - _initialY) < 40) {
+    		// Something is selected and we aren't scrolling or swiping or something.
         	getWidget(_selected).removeStyleName(Secondary.Pressed);
     		//_selected = -1; need to keep the selected value for click event.
+    		//Utils.Console("drag end selected item #" +_selected);
+    		ListItem item = (ListItem) getWidget(_selected);
+    		if (item.isEnabled()) {
+	            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected,
+	            	e.getNativeEvent().getEventTarget());
+	            this.fireEvent(selectionChangedEvent);
+	            Utils.Console("Firing selection event");
+	            new Timer() {
+	            	@Override
+	            	public void run() {
+				    	if (_selected >= 0) {
+				    		ListItem item = (ListItem) getWidget(_selected);
+				    		if (item.isEnabled()) {
+					        	getWidget(_selected).removeStyleName(Secondary.Pressed);
+				    		}
+				    	}
+	            	}
+	            }.schedule(75);
+    		}
+    		_selected = -1;
     	}
     }
-    
+
     public ListItem getItem(int index) {
     	return (ListItem) getWidget(index);
     }
-    
-    static class Chevron extends HTML {    	
+
+    static class Chevron extends HTML {
     	public Chevron() {
     		super("<div class=\"Chevron\"><span></span><span></span></div>");
     	}
