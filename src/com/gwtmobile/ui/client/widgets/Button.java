@@ -27,6 +27,12 @@ import com.gwtmobile.ui.client.event.DragController;
 import com.gwtmobile.ui.client.event.DragEvent;
 import com.gwtmobile.ui.client.event.DragEventsHandler;
 
+
+/**
+ *  kevindeem:  Modified this class to use the GWT button as a base because of
+ *  issue with android 5.0.1 where it doesn't wanna work with click events.
+ *
+ */
 public class Button extends com.google.gwt.user.client.ui.Button implements DragEventsHandler, IsGwtMobileWidget {
 
 	private boolean _isDisabled = false;
