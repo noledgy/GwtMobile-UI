@@ -92,8 +92,7 @@ html {
 	color: #fff;
 	text-decoration: none;
 	display: block;
-  padding: 1.0em 1.5em 2.5em 1.5em;
-	Xpadding: 0.3em 0.5em 0.5em 0.5em;
+	padding: 0.3em 0.5em 0.5em 0.5em;
 	-webkit-border-radius: 0.3em;
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#838383), color-stop(0.5, #444), color-stop(0.5, #303030), to(#333));
 	border: solid 0px rgba(79, 79, 79, 0.75);
