@@ -54,12 +54,10 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     @Override
     protected void onAttach() {
     	super.onAttach();
-        DragController.get().addDragEventsHandler(this);
     }
 
     @Override
     protected void onDetach() {
-    	DragController.get().removeDragEventsHandler(this);
     	super.onDetach();
     }
 
@@ -70,10 +68,12 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     @Override
     public void onLoad() {
         super.onLoad();
+        DragController.get().addDragEventsHandler(this);
     }
 
     @Override
     public void onUnload() {
+    	DragController.get().removeDragEventsHandler(this);
     }
 
     @Override
