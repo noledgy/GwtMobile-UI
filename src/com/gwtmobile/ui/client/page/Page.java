@@ -25,7 +25,6 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtmobile.ui.client.CSS.StyleNames.Primary;
 import com.gwtmobile.ui.client.page.PageHistory.NavigateInfo;
@@ -75,10 +74,10 @@ public abstract class Page extends WidgetBase implements IsGwtMobilePanel {
 	}
 
 	private static void hideAddressBar() {
-		int barHeight = Utils.isIOS() ? 60 : Utils.isAndroid() ? 1 : 0;
-		if (barHeight > 0) {
-			RootLayoutPanel.get().setHeight(Window.getClientHeight() + barHeight + "px");
-		}
+//		int barHeight = Utils.isIOS() ? 60 : Utils.isAndroid() ? 1 : 0;
+//		if (barHeight > 0) {
+//			RootLayoutPanel.get().setHeight(Window.getClientHeight() + barHeight + "px");
+//		}
 	}
 
 	private static void scrollToHideAddressBar() {
