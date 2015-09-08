@@ -24,7 +24,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtmobile.ui.client.CSS.StyleNames.Primary;
 import com.gwtmobile.ui.client.CSS.StyleNames.Secondary;
-import com.gwtmobile.ui.client.event.DragController;
 import com.gwtmobile.ui.client.event.DragEvent;
 import com.gwtmobile.ui.client.event.DragEventsHandler;
 import com.gwtmobile.ui.client.event.SelectionChangedEvent;
@@ -41,7 +40,7 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
 	private double _initialY = 0.0;
 
     public ListPanel() {
-        addDomHandler(this, ClickEvent.getType());
+        //addDomHandler(this, ClickEvent.getType());
 
         setStyleName(Primary.ListPanel);
     }
@@ -68,18 +67,19 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     @Override
     public void onLoad() {
         super.onLoad();
-        DragController.get().addDragEventsHandler(this);
+        //DragController.get().addDragEventsHandler(this);
     }
 
     @Override
     public void onUnload() {
-    	DragController.get().removeDragEventsHandler(this);
+    	//DragController.get().removeDragEventsHandler(this);
     }
 
     @Override
     public void add(Widget w) {
     	if (w instanceof ListItem || isDesignTimeEmptyLabel(w)) {
     		super.add(w);
+    		((ListItem)w).setClickHandler(this);
     	}
     	else {
         	ListItem listItem = new ListItem();
@@ -92,23 +92,53 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     	}
     }
 
+    /* (non-Javadoc)
+     * @see com.google.gwt.event.dom.client.ClickHandler#onClick(com.google.gwt.event.dom.client.ClickEvent)
+     */
     @Override
     public void onClick(ClickEvent e) {
-		//Utils.Console("Clicking List #" +_selected);
-    	// samsuns on 5.0.1 does not get click events for this control.
-    	// so I moved the behavior to the drag end.
-//        if (_selected >= 0) {
-//    		ListItem item = (ListItem) getWidget(_selected);
-//    		if (item.isEnabled()) {
-//	            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected,
-//	            	e.getNativeEvent().getEventTarget());
-//	            this.fireEvent(selectionChangedEvent);
-//	            Utils.Console("Firing selection event");
-//	        	item.removeStyleName(Secondary.Pressed);
-//    		}
-//    		_selected = -1;
-//        }
+    	// this version of on click gets triggered by items being touched.
+    	_selected = getChildren().indexOf((Widget)e.getSource());
+    	if (_selected >= 0) {
+    		ListItem item = (ListItem) getWidget(_selected);
+    		if (item.isEnabled()) {
+	            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected,
+	            	e.getNativeEvent().getEventTarget());
+	            this.fireEvent(selectionChangedEvent);
+	            Utils.Console("Firing selection event");
+	        	item.removeStyleName(Secondary.Pressed);
+    		}
+    		_selected = -1;
+        } else {
+        	Utils.Console("Recieved Click Event for non item");
+        }
     }
+
+//    @Override
+//    public void onClick(ClickEvent e) {
+//    	// when not android 5.0
+//
+//    	Object source = e.getSource();
+//    	Utils.Console(source.getClass().getName());
+//    	int[] androidVersion = Utils.getAndroidVersionValues();
+//    	if (null == androidVersion || androidVersion[0] < 5) {
+//    		Utils.Console("Clicked with " +(androidVersion != null?androidVersion[0]:"null") +": x("+e.getX()+")y("+e.getY()+")");
+//    		if (_selected >= 0) {
+//	    		ListItem item = (ListItem) getWidget(_selected);
+//	    		if (item.isEnabled()) {
+//		            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected,
+//		            	e.getNativeEvent().getEventTarget());
+//		            this.fireEvent(selectionChangedEvent);
+//		            Utils.Console("Firing selection event");
+//		        	item.removeStyleName(Secondary.Pressed);
+//	    		}
+//	    		_selected = -1;
+//	        } else {
+//	        	Utils.Console("click version was " + (androidVersion != null?androidVersion[0]:"null"));
+//	        }
+//    	}
+//
+//    }
 
     public void setDisplayArrow(ShowArrow show) {
     	_showArrow = show;
@@ -188,7 +218,9 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     		//_selected = -1; need to keep the selected value for click event.
     		//Utils.Console("drag end selected item #" +_selected);
     		ListItem item = (ListItem) getWidget(_selected);
-    		if (item.isEnabled()) {
+        	int[] androidVersion = Utils.getAndroidVersionValues();
+        	// for android 5.0
+    		if (item.isEnabled() && null != androidVersion && androidVersion[0] >= 5) {
 	            SelectionChangedEvent selectionChangedEvent = new SelectionChangedEvent(_selected,
 	            	e.getNativeEvent().getEventTarget());
 	            this.fireEvent(selectionChangedEvent);
@@ -204,6 +236,8 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
 				    	}
 	            	}
 	            }.schedule(75);
+    		} else {
+    			Utils.Console("not " + (androidVersion != null?androidVersion[0]:"null"));
     		}
     		_selected = -1;
     	}
