@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2010 Zhihua (Dennis) Jiang
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -33,7 +33,7 @@ public class Utils {
 //		if ($wnd.console) {
 //			$wnd.console.log(msg);
 //		}
-//		else 
+//		else
 		{
 			var log = $doc.getElementById('log');
 			if (log) {
@@ -44,21 +44,21 @@ public class Utils {
                   $wnd.console.log(msg);
               }
 			}
-		}		
+		}
 	}-*/;
 
 	public static native JavaScriptObject addEventListener(Element ele, String event, boolean capture, EventListener listener) /*-{
 		var callBack = function(e) {
-			listener.@com.google.gwt.user.client.EventListener::onBrowserEvent(Lcom/google/gwt/user/client/Event;)(e);			
+			listener.@com.google.gwt.user.client.EventListener::onBrowserEvent(Lcom/google/gwt/user/client/Event;)(e);
 		};
 		ele.addEventListener(event, callBack, capture);
 		return callBack;
 	}-*/;
-	
+
 	public static native void addEventListenerOnce(Element ele, String event, boolean capture, EventListener listener) /*-{
 		var callBack = function(e) {
 			ele.removeEventListener(event, callBack, capture);
-			listener.@com.google.gwt.user.client.EventListener::onBrowserEvent(Lcom/google/gwt/user/client/Event;)(e);			
+			listener.@com.google.gwt.user.client.EventListener::onBrowserEvent(Lcom/google/gwt/user/client/Event;)(e);
 		};
 		ele.addEventListener(event, callBack, capture);
 	}-*/;
@@ -67,14 +67,14 @@ public class Utils {
         ele.removeEventListener(event, callBack, capture);
     }-*/;
 
-	
+
     private static Element htmlNode = DOM.createElement("DIV");
     public static String unescapeHTML(String html) {
         htmlNode.setInnerHTML(html);
-        return htmlNode.getInnerText(); 
+        return htmlNode.getInnerText();
     }
-    
-    //The url loaded by this method can be intercepted by 
+
+    //The url loaded by this method can be intercepted by
     //WebViewClient.shouldOverrideUrlLoading
     public static void loadUrl(String url) {
 		Anchor a = new Anchor("", url);
@@ -91,58 +91,92 @@ public class Utils {
     	String FromControls = "BUTTON INPUT SELECT TEXTAREA";
     	String nodeName = ele.getNodeName().toUpperCase();
     	String roleName = ele.getAttribute("role").toUpperCase();
-    	return FromControls.contains(nodeName) 
+    	return FromControls.contains(nodeName)
     		|| roleName.length() > 0 && FromControls.contains(roleName)
     		|| isHtmlFormControl(ele.getParentElement());
     }
-    
+
     public native static Element getActiveElement() /*-{
     	return $doc.activeElement;
     }-*/;
-    
+
     public static boolean isAndroid() {
     	return Window.Navigator.getUserAgent().contains("Android");
     }
-    
+
+    public static int[] getAndroidVersionValues() {
+    	String version = getAndroidVersion();
+    	if (null != version) {
+    		String[] bits = version.split("\\.");
+
+			if (bits.length == 3) {
+				try {
+					int[] rv = { Integer.parseInt(bits[0]),
+							Integer.parseInt(bits[1]), Integer.parseInt(bits[2]) };
+					return rv;
+				} catch (NumberFormatException e) {
+					return null;
+				}
+    		}
+    	}
+    	return null;
+    }
+
+    public static String getAndroidVersion() {
+    	final String linux = "(Linux;";
+    	final String android = "Android ";
+    	String ua = Window.Navigator.getUserAgent();
+    	Utils.Console(ua);
+    	int ind = -1;
+    	if (ua.startsWith("Mozilla/5.0") &&
+    		ua.contains(linux) &&
+    		(ind = ua.indexOf(android)) > -1) {
+    		String version = ua.substring(ind + android.length());
+    		version = version.substring(0,version.indexOf(";")).trim();
+    		return version;
+    	}
+    	return null;
+    }
+
     public static boolean isMobileChrome() {
     	return isAndroid() &&
     		Window.Navigator.getUserAgent().contains("CrMo");
     }
-    
+
     public static boolean isIOS() {
     	String ua = Window.Navigator.getUserAgent();
-    	return ua.contains("iPhone") || 
-    			ua.contains("iPod") || 
+    	return ua.contains("iPhone") ||
+    			ua.contains("iPod") ||
     			ua.contains("iPad");
     }
-    
+
     public static boolean isDesktop() {
     	return !isAndroid() && !isIOS() && !isBlackBerry();
     }
-    
+
     private static boolean isBlackBerry() {
         //BlackBerry 6 and BlackBerry 7     Mozilla/5.0 (BlackBerry; U; BlackBerry AAAA; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/X.X.X.X Mobile Safari/534.11+
         //BlackBerry Tablet OS              Mozilla/5.0 (PlayBook; U; RIM Tablet OS 2.0.0; en-US) AppleWebKit/535.8+ (KHTML, like Gecko) Version/7.2.0.0 Safari/535.8+
         //BlackBerry 10                     Mozilla/5.0 (BB10; <Device Type>) AppleWebKit/537.10+ (KHTML, like Gecko) Version/<BB Version #> Mobile Safari/537.10+
-        return Window.Navigator.getUserAgent().toLowerCase().contains("blackberry") || 
-        Window.Navigator.getUserAgent().toLowerCase().contains("bb10") || 
+        return Window.Navigator.getUserAgent().toLowerCase().contains("blackberry") ||
+        Window.Navigator.getUserAgent().toLowerCase().contains("bb10") ||
         Window.Navigator.getUserAgent().toLowerCase().contains("playbook");
     }
 
 	public static boolean isWVGA() {
 		return Document.get().getDocumentElement().getClassName().contains("WVGA");
     }
-    
+
 	public static native void setTranslateX(Element ele, double value) /*-{
 		ele.style.webkitTransform = "translate3d(" + value + "px, 0px, 0px)";
 	}-*/;
-	
+
 	public static native int getTranslateX(Element ele) /*-{
 	    var transform = ele.style.webkitTransform;
-	    var translateX = 0;        
+	    var translateX = 0;
 	    if (transform && transform !== "") {
 	        translateX = parseInt((/translate3d\((\-?.*)px, 0px, 0px\)/).exec(transform)[1]);
-	    }        
+	    }
 	    return translateX;
 	}-*/;
 
@@ -152,10 +186,10 @@ public class Utils {
 
 	public static native int getTranslateY(Element ele) /*-{
 	    var transform = ele.style.webkitTransform;
-	    var translateY = 0;        
+	    var translateY = 0;
 	    if (transform && transform !== "") {
 	        translateY = parseInt((/translate3d\(0px, (\-?.*)px, 0px\)/).exec(transform)[1]);
-	    }        
+	    }
 	    return translateY;
 	}-*/;
 
@@ -163,11 +197,11 @@ public class Utils {
 		var matrix = new WebKitCSSMatrix(window.getComputedStyle(ele).webkitTransform);
 		return matrix.f;
 	}-*/;
-	
+
 	public static native void setTransitionDuration(Element ele, double value) /*-{
 		ele.style.webkitTransitionDuration = "" + value + "ms";
 	}-*/;
-	
+
 	public static native int getHeight(Element ele) /*-{
 		return parseInt($doc.defaultView.getComputedStyle(ele, "").getPropertyValue("height"));
 	}-*/;
@@ -177,7 +211,7 @@ public class Utils {
 	}-*/;
 
 	public static native int getPaddingHeight(Element ele) /*-{
-		return parseInt($doc.defaultView.getComputedStyle(ele, "").getPropertyValue("padding-top")) + 
+		return parseInt($doc.defaultView.getComputedStyle(ele, "").getPropertyValue("padding-top")) +
 			parseInt($doc.defaultView.getComputedStyle(ele, "").getPropertyValue("padding-bottom"));
 	}-*/;
 
@@ -194,11 +228,11 @@ public class Utils {
             }
         }
         int index = DOM.getChildIndex(
-        		(com.google.gwt.user.client.Element)parent, 
+        		(com.google.gwt.user.client.Element)parent,
         		(com.google.gwt.user.client.Element)div);
         return index;
     }
-    
+
 	public static native void setHeight(Element ele, double value) /*-{
 		ele.style.height = value+"px";
 	}-*/;
@@ -206,21 +240,21 @@ public class Utils {
 	public static native boolean hasPhoneGap() /*-{
 		return $wnd.PhoneGap != null;
 	}-*/;
-	
+
 	public static native void setLinkHref(String linkElementId, String url) /*-{
         var link = $doc.getElementById(linkElementId);
         if (link != null && link != undefined) {
             link.href = url;
         }
     }-*/;
-	
+
 	public static native void setCssHref(String url) /*-{
 	    var link = $doc.getElementsByTagName("link")[0];
 	    if (link != null && link != undefined) {
 	        link.href = url;
 	    }
 	}-*/;
-	
+
 	public static native String getCssHref() /*-{
 	    var link = $doc.getElementsByTagName("link")[0];
 	    if (link != null && link != undefined) {
@@ -228,7 +262,7 @@ public class Utils {
 	    }
 	    return null;
 	}-*/;
-	
+
 	//GWT does not support the getSimpleName() method.
 	public static String getSimpleName(Class<?> clazz) {
 		return clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);

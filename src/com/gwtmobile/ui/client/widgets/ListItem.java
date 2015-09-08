@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2010 Zhihua (Dennis) Jiang
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,8 +16,13 @@
 
 package com.gwtmobile.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtmobile.ui.client.CSS.StyleNames.Secondary;
+import com.gwtmobile.ui.client.event.TapRecognizer;
 import com.gwtmobile.ui.client.widgets.ListPanel.Chevron;
 
 public class ListItem extends PanelBase {
@@ -25,12 +30,31 @@ public class ListItem extends PanelBase {
 	public enum ShowArrow { InheritFromParent, Visible, Hidden };
 	protected ShowArrow _displayArrow = ShowArrow.InheritFromParent;
 	protected boolean _enabled = true;
+	private TapRecognizer _tapRecognizer;
+	private HandlerRegistration _clickReg = null;
 
 	public ListItem() {
-		// there is no named style role for list item. 
+		// there is no named style role for list item.
     	//setStyleName("gwtm-ListItem");
     }
-	
+
+	@Override
+	protected void onAttach() {
+		super.onAttach();
+		_tapRecognizer = new TapRecognizer(this, 40);
+	}
+
+	@Override
+	protected void onDetach() {
+		super.onDetach();
+		if (null != _tapRecognizer) {
+			_tapRecognizer.removeHandler();
+		}
+		if (null != _clickReg) {
+			_clickReg.removeHandler();
+		}
+	}
+
 	@Override
 	protected String getDesignTimeMessage() {
 		return "Add widgets.";
@@ -41,7 +65,7 @@ public class ListItem extends PanelBase {
 		if (ShowArrow.InheritFromParent.compareTo(showA) != -1)
 			return;
 		boolean show = (ShowArrow.Visible.compareTo(showA)!=-1);
-		
+
 		int last = getWidgetCount() - 1;
 		if (last >=0) {
 			Widget widget = getWidget(last);
@@ -55,13 +79,13 @@ public class ListItem extends PanelBase {
 					add(new ListPanel.Chevron());
 				}
 			}
-		}		
+		}
 	}
-	
+
 	public ShowArrow getDisplayArrow() {
 		return this._displayArrow;
 	}
-	
+
 	public void setEnabled(boolean disabled) {
 		this._enabled = disabled;
 		if (!isEnabled()) {
@@ -70,16 +94,20 @@ public class ListItem extends PanelBase {
 			removeStyleName(Secondary.Disabled);
 		}
 	}
-	
+
 	public boolean isEnabled() {
 		return this._enabled;
 	}
-	
+
 	protected void setDisplayArrowFromParent(ListPanel.ShowArrow show) {
 		// Parent can only override if it has not been set.
 		if (this._displayArrow == ShowArrow.InheritFromParent) {
 			setDisplayArrow(ShowArrow.valueOf(show.toString()));
 		}
+	}
+
+	public void setClickHandler(ClickHandler listPanel) {
+		_clickReg = addDomHandler(listPanel, ClickEvent.getType());
 	}
 
 }
