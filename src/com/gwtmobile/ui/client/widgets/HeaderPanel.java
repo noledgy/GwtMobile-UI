@@ -89,7 +89,7 @@ public class HeaderPanel extends PanelBase {
         		leftButton.setWidget(new BackButton(buttonName, clickHandler));
         	}
         	else {
-        		leftButton.setWidget(new Button(buttonName, clickHandler));
+        		leftButton.setWidget(new HeaderButton(buttonName, clickHandler));
         	}
     	}
     }
@@ -130,7 +130,7 @@ public class HeaderPanel extends PanelBase {
         		rightButton.setWidget(new NextButton(buttonName, clickHandler));
         	}
         	else {
-        		rightButton.setWidget(new Button(buttonName, clickHandler));
+        		rightButton.setWidget(new HeaderButton(buttonName, clickHandler));
         	}
     	}
     }

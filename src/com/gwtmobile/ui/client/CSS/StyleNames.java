@@ -13,6 +13,7 @@ public interface StyleNames {
 		String Desktop = "Desktop";
 
 		String BackButton = "gwtm-BackButton";
+		String HeaderButton = "gwtm-HeaderButton";
 		String Button = "gwtm-Button";
 		String Chevron = "Chevron";
 		String CheckBoxGroup = "gwtm-CheckBoxGroup";
@@ -46,14 +47,14 @@ public interface StyleNames {
 		String TextBox = "TextBox";
 		String VerticalPanel = "gwtm-VerticalPanel";
 	}
-	
+
 	public interface Secondary {
 		String Bottom = "Bottom";
 		String Collapsed = "Collapsed";
 		String Disabled = "Disabled";
 		String Error = "Error";
 		String Expanded = "Expanded";
-		String FullHeight = "FullHeight";		
+		String FullHeight = "FullHeight";
 		String Horizontal = "Horizontal";
 		String Pressed = "Pressed";
 		String Selected = "Selected";
