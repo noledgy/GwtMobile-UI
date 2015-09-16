@@ -29,13 +29,22 @@ import com.gwtmobile.ui.client.CSS.StyleNames.Primary;
 
 public class HeaderPanel extends PanelBase {
 
+  SimplePanel  leftButton;
+  FlowPanel    contents;
+  SimplePanel  rightButton;
 	ClickHandler _leftButtonClickHandler;
 	ClickHandler _rightButtonClickHandler;
 
     public HeaderPanel() {
-    	super.add(new SimplePanel());	//left button placeholder
-    	super.add(new FlowPanel());		//contents
-    	super.add(new SimplePanel());	//right button placeholder
+      leftButton  = new SimplePanel();
+      contents    = new FlowPanel();
+      rightButton = new SimplePanel();
+
+    	super.add(leftButton);	//left button placeholder
+    	super.add(new SimplePanel()); // left spacer
+    	super.add(contents);		//contents
+      super.add(new SimplePanel()); // right spacer
+    	super.add(rightButton);	//right button placeholder
         setStyleName(Primary.HeaderPanel);
         if (Beans.isDesignTime()) {
             add(new Label("Empty HeaderPanel. " + getDesignTimeMessage()));
@@ -49,7 +58,6 @@ public class HeaderPanel extends PanelBase {
 
     @Override
     public void add(Widget w) {
-    	FlowPanel contents = (FlowPanel)getWidget(1);
     	if (Beans.isDesignTime() && contents.getWidgetCount() > 0) {
     		Widget widget = contents.getWidget(0);
     		if (widget instanceof Label && ((Label)widget).getText().contains(getDesignTimeMessage())) {
@@ -61,14 +69,12 @@ public class HeaderPanel extends PanelBase {
 
     public void setCaption(String caption) {
     	if (!caption.isEmpty()) {
-        	FlowPanel contents = (FlowPanel)getWidget(1);
         	contents.clear();
     		contents.add(new HTML(caption));
     	}
     }
 
     public String getCaption() {
-    	FlowPanel contents = (FlowPanel)getWidget(1);
     	if (contents.getWidgetCount() > 0) {
         	HTML w = (HTML) contents.getWidget(0);
         	return w.getHTML();
@@ -78,7 +84,6 @@ public class HeaderPanel extends PanelBase {
 
     public void setLeftButton(String buttonName) {
     	if (!buttonName.isEmpty()) {
-        	SimplePanel leftButton = (SimplePanel)getWidget(0);
         	ClickHandler clickHandler = new ClickHandler() {
     			@Override
     			public void onClick(ClickEvent event) {
@@ -106,7 +111,6 @@ public class HeaderPanel extends PanelBase {
      */
     public void setBackButton(String buttonName) {
       if (!buttonName.isEmpty()) {
-        SimplePanel leftButton = (SimplePanel)getWidget(0);
         ClickHandler clickHandler = new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
@@ -119,7 +123,6 @@ public class HeaderPanel extends PanelBase {
 
     public void setRightButton(String buttonName) {
     	if (!buttonName.isEmpty()) {
-        	SimplePanel rightButton = (SimplePanel)getWidget(2);
         	ClickHandler clickHandler = new ClickHandler() {
     			@Override
     			public void onClick(ClickEvent event) {
@@ -136,12 +139,10 @@ public class HeaderPanel extends PanelBase {
     }
 
     public Button getLeftButton() {
-    	SimplePanel leftButton = (SimplePanel)getWidget(0);
     	return (Button) leftButton.getWidget();
     }
 
     public Button getRightButton() {
-    	SimplePanel rightButton = (SimplePanel)getWidget(2);
     	return (Button) rightButton.getWidget();
     }
 
