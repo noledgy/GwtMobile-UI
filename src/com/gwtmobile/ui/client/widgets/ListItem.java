@@ -39,20 +39,33 @@ public class ListItem extends PanelBase {
     }
 
 	@Override
+	public void onLoad() {
+		super.onLoad();
+		_tapRecognizer = new TapRecognizer(this, 40);
+	}
+
+	@Override
+	protected void onUnload() {
+		// TODO Auto-generated method stub
+		super.onUnload();
+		if (null != _tapRecognizer) {
+			_tapRecognizer.removeHandler();
+			_tapRecognizer = null;
+		}
+		if (null != _clickReg) {
+			_clickReg.removeHandler();
+			_clickReg = null;
+		}
+	}
+
+	@Override
 	protected void onAttach() {
 		super.onAttach();
-		_tapRecognizer = new TapRecognizer(this, 40);
 	}
 
 	@Override
 	protected void onDetach() {
 		super.onDetach();
-		if (null != _tapRecognizer) {
-			_tapRecognizer.removeHandler();
-		}
-		if (null != _clickReg) {
-			_clickReg.removeHandler();
-		}
 	}
 
 	@Override
@@ -106,8 +119,13 @@ public class ListItem extends PanelBase {
 		}
 	}
 
-	public void setClickHandler(ClickHandler listPanel) {
-		_clickReg = addDomHandler(listPanel, ClickEvent.getType());
+	/**
+	 * Sets the click handler (uses a tap recognizer to spot touches)
+	 * @param handler
+	 */
+	public void setClickHandler(ClickHandler handler) {
+		if (null != _clickReg && null != handler) _clickReg.removeHandler();
+		_clickReg = addDomHandler(handler, ClickEvent.getType());
 	}
 
 }

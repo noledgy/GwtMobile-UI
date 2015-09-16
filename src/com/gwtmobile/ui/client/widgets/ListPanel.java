@@ -38,6 +38,7 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
 	private boolean _selectable = true;
 	private double _initialX = 0.0;
 	private double _initialY = 0.0;
+	private long _lastClick = 0l;
 
     public ListPanel() {
         //addDomHandler(this, ClickEvent.getType());
@@ -98,6 +99,11 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     @Override
     public void onClick(ClickEvent e) {
     	// this version of on click gets triggered by items being touched.
+    	long milis = System.currentTimeMillis();
+    	if (_lastClick > 0l && milis - _lastClick < 40) {
+    		return;
+    	}
+    	_lastClick = milis;
     	_selected = getChildren().indexOf((Widget)e.getSource());
     	if (_selected >= 0) {
     		ListItem item = (ListItem) getWidget(_selected);

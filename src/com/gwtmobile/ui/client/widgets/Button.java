@@ -22,10 +22,12 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.HTML;
 import com.gwtmobile.ui.client.CSS.StyleNames;
 import com.gwtmobile.ui.client.event.DragController;
 import com.gwtmobile.ui.client.event.DragEvent;
 import com.gwtmobile.ui.client.event.DragEventsHandler;
+import com.gwtmobile.ui.client.event.TapRecognizer;
 
 
 /**
@@ -33,12 +35,13 @@ import com.gwtmobile.ui.client.event.DragEventsHandler;
  *  issue with android 5.0.1 where it doesn't wanna work with click events.
  *
  */
-public class Button extends com.google.gwt.user.client.ui.Button implements DragEventsHandler, IsGwtMobileWidget {
+public class Button extends HTML implements DragEventsHandler, IsGwtMobileWidget {
 
 	private boolean _isDisabled = false;
 	private IsGwtMobileWidgetHelper _widgetHelper = new IsGwtMobileWidgetHelper();
 	List<ClickHandler> _handlers = new ArrayList<ClickHandler>();
 	long _lastClick = 0;
+	private TapRecognizer _tapRegognizer;
 
 	public class ButtonHandlerRegistration implements HandlerRegistration
 	{
@@ -74,9 +77,10 @@ public class Button extends com.google.gwt.user.client.ui.Button implements Drag
 		});
     }
 
+
     public Button(String caption, ClickHandler handler) {
         this();
-        setText(caption);
+        setHTML(caption);
         this.addClickHandler(handler);
     }
 
@@ -90,11 +94,16 @@ public class Button extends com.google.gwt.user.client.ui.Button implements Drag
         super.onLoad();
         //DragController.get().addDragEventsHandler(this);
         _widgetHelper.CheckInitialLoad(this);
+        _tapRegognizer = new TapRecognizer(this, 40);
     }
 
     @Override
     public void onUnload() {
         //DragController.get().removeDragEventsHandler(this);
+    	if (null != _tapRegognizer) {
+    		_tapRegognizer.removeHandler();
+    		_tapRegognizer = null;
+    	}
     }
 
     @Override
