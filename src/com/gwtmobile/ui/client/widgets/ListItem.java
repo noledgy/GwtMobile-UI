@@ -23,6 +23,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtmobile.ui.client.CSS.StyleNames.Secondary;
 import com.gwtmobile.ui.client.event.TapRecognizer;
+import com.gwtmobile.ui.client.utils.Utils;
 import com.gwtmobile.ui.client.widgets.ListPanel.Chevron;
 
 public class ListItem extends PanelBase {
@@ -41,12 +42,13 @@ public class ListItem extends PanelBase {
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		_tapRecognizer = new TapRecognizer(this, 40);
+		if (null == _tapRecognizer) {
+			_tapRecognizer = new TapRecognizer(this, 40);
+		}
 	}
 
 	@Override
 	protected void onUnload() {
-		// TODO Auto-generated method stub
 		super.onUnload();
 		if (null != _tapRecognizer) {
 			_tapRecognizer.removeHandler();

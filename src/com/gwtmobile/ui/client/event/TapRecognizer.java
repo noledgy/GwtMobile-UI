@@ -56,7 +56,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		Touch touch = event.getTouches().get(0);
 		initialX = touch.getPageX();
 		initialY = touch.getPageY();
-		Utils.Console("touch start in tap recognizer");
+		//Utils.Console("touch start in tap recognizer");
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 			initialX = touch.getPageX();
 			initialY = touch.getPageY();
 		}
-		Utils.Console("touch move in tap recognizer");
+		//Utils.Console("touch move in tap recognizer");
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 			fireClick(source.getElement());
 		}
 		initialX = initialY = 0;
-		Utils.Console("touch end in tap recognizer");
+		//Utils.Console("touch end in tap recognizer");
 	}
 
 
@@ -90,12 +90,12 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 	public void onTouchCancel(TouchCancelEvent event) {
 		touchCancelled = true;
 		initialX = initialY = 0;
-		Utils.Console("touch cancel in tap recognizer");
+		//Utils.Console("touch cancel in tap recognizer");
 	}
 
 	public static native void fireClick(Element element) /*-{
 		element.click();
-		$wnd.console("");
+		//$wnd.console("");
 	}-*/;
 
 
