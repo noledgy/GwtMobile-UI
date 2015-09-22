@@ -53,18 +53,22 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 	@Override
 	public void onTouchStart(TouchStartEvent event) {
 		touchCancelled = false;
-		Touch touch = event.getTouches().get(0);
-		initialX = touch.getPageX();
-		initialY = touch.getPageY();
+		initialX = event.getNativeEvent().getClientX();
+		initialY = event.getNativeEvent().getClientY();
+		//Touch touch = event.getTouches().get(0);
+		//initialX = touch.getClientX();
+		//initialY = touch.getClientY();
 		//Utils.Console("touch start in tap recognizer");
 	}
 
 	@Override
 	public void onTouchMove(TouchMoveEvent event) {
 		if (initialX == 0 && initialY == 0) {
-			Touch touch = event.getTouches().get(0);
-			initialX = touch.getPageX();
-			initialY = touch.getPageY();
+			initialX = event.getNativeEvent().getClientX();
+			initialY = event.getNativeEvent().getClientY();
+//			Touch touch = event.getTouches().get(0);
+//			initialX = touch.getClientX();
+//			initialY = touch.getClientY();
 		}
 		//Utils.Console("touch move in tap recognizer");
 	}
@@ -72,8 +76,10 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 	@Override
 	public void onTouchEnd(TouchEndEvent event) {
 		Touch touch = event.getTouches().get(0);
-		int x = touch.getPageX();
-		int y = touch.getPageY();
+		int x = event.getNativeEvent().getClientX();
+		int y = event.getNativeEvent().getClientY();
+//		int x = touch.getClientX();
+//		int y = touch.getClientY();
 		if (!touchCancelled
 				&& Math.abs(x - initialX) < distance
 				&& Math.abs(y - initialY) < distance

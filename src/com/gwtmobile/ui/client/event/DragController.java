@@ -98,7 +98,7 @@ public abstract class DragController implements EventListener {
         if (_suppressNextClick || Page.isInTransition()) {
             e.stopPropagation();
             _suppressNextClick = false;
-            Utils.Console("click suppressed");
+            //Utils.Console("click suppressed");
         }
     }
 
@@ -250,12 +250,12 @@ public abstract class DragController implements EventListener {
 
     public void suspend() {
         unregisterEvents();
-        Utils.Console("drag events suspended.");
+        //Utils.Console("drag events suspended.");
     }
 
     public void resume() {
         registerEvents();
-        Utils.Console("drag events resumed.");
+        //Utils.Console("drag events resumed.");
     }
 
     public boolean captureDragEvents(DragEventsHandler cachingHandler) {
