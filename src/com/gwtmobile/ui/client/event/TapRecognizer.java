@@ -33,6 +33,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 	private int initialY = 0;
 	private int distance;
 	boolean touchCancelled = false;
+	private boolean moving = false;
 
 
 	public TapRecognizer(Widget source, int distance) {
@@ -59,6 +60,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		//initialX = touch.getClientX();
 		//initialY = touch.getClientY();
 		//Utils.Console("touch start in tap recognizer");
+		moving = false;
 	}
 
 	@Override
@@ -69,6 +71,13 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 //			Touch touch = event.getTouches().get(0);
 //			initialX = touch.getClientX();
 //			initialY = touch.getClientY();
+		} else {
+			int x = event.getNativeEvent().getClientX();
+			int y = event.getNativeEvent().getClientY();
+			if (Math.abs(x - initialX) > distance
+				|| Math.abs(y - initialY) > distance) {
+				moving  = true;
+			}
 		}
 		//Utils.Console("touch move in tap recognizer");
 	}
@@ -80,7 +89,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		int y = event.getNativeEvent().getClientY();
 //		int x = touch.getClientX();
 //		int y = touch.getClientY();
-		if (!touchCancelled
+		if (!moving && !touchCancelled
 				&& Math.abs(x - initialX) < distance
 				&& Math.abs(y - initialY) < distance
 				&& null != source) {
@@ -97,6 +106,7 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		touchCancelled = true;
 		initialX = initialY = 0;
 		//Utils.Console("touch cancel in tap recognizer");
+		moving = false;
 	}
 
 	public static native void fireClick(Element element) /*-{
@@ -110,5 +120,15 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		for (HandlerRegistration r : registrations) {
 			r.removeHandler();
 		}
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		removeHandler();
+		super.finalize();
+	}
+
+	public boolean isMoving() {
+		return moving;
 	}
 }

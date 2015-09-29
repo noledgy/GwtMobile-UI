@@ -33,6 +33,7 @@ public class ListItem extends PanelBase {
 	protected boolean _enabled = true;
 	private TapRecognizer _tapRecognizer;
 	private HandlerRegistration _clickReg = null;
+	ClickHandler _handler = null;
 
 	public ListItem() {
 		// there is no named style role for list item.
@@ -43,7 +44,7 @@ public class ListItem extends PanelBase {
 	public void onLoad() {
 		super.onLoad();
 		if (null == _tapRecognizer) {
-			_tapRecognizer = new TapRecognizer(this, 40);
+			//_tapRecognizer = new TapRecognizer(this, 20);
 		}
 	}
 
@@ -127,7 +128,15 @@ public class ListItem extends PanelBase {
 	 */
 	public void setClickHandler(ClickHandler handler) {
 		if (null != _clickReg && null != handler) _clickReg.removeHandler();
-		_clickReg = addDomHandler(handler, ClickEvent.getType());
+		_handler = handler;
+		//if (Utils.isDesktop()) {
+		//	_clickReg = addDomHandler(handler, ClickEvent.getType());
+		//}
+	}
+
+	public boolean isMoving() {
+		if (null != _tapRecognizer) return _tapRecognizer.isMoving();
+		return false;
 	}
 
 }
