@@ -19,6 +19,7 @@ package com.gwtmobile.ui.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -35,13 +36,13 @@ import com.gwtmobile.ui.client.event.TapRecognizer;
  *  issue with android 5.0.1 where it doesn't wanna work with click events.
  *
  */
-public class Button extends HTML implements DragEventsHandler, IsGwtMobileWidget {
+public class Button extends HTML implements DragEventsHandler, IsGwtMobileWidget, TapClick {
 
 	private boolean _isDisabled = false;
 	private IsGwtMobileWidgetHelper _widgetHelper = new IsGwtMobileWidgetHelper();
 	List<ClickHandler> _handlers = new ArrayList<ClickHandler>();
 	long _lastClick = 0;
-	private TapRecognizer _tapRegognizer;
+	private TapRecognizer _tapRegcognizer;
 
 	public class ButtonHandlerRegistration implements HandlerRegistration
 	{
@@ -92,17 +93,15 @@ public class Button extends HTML implements DragEventsHandler, IsGwtMobileWidget
     @Override
     public void onLoad() {
         super.onLoad();
-        //DragController.get().addDragEventsHandler(this);
         _widgetHelper.CheckInitialLoad(this);
-        _tapRegognizer = new TapRecognizer(this, 40);
+        _tapRegcognizer = new TapRecognizer(this, 40, this);
     }
 
     @Override
     public void onUnload() {
-        //DragController.get().removeDragEventsHandler(this);
-    	if (null != _tapRegognizer) {
-    		_tapRegognizer.removeHandler();
-    		_tapRegognizer = null;
+    	if (null != _tapRegcognizer) {
+    		_tapRegcognizer.removeHandler();
+    		_tapRegcognizer = null;
     	}
     }
 
@@ -155,4 +154,25 @@ public class Button extends HTML implements DragEventsHandler, IsGwtMobileWidget
 	public void setSecondaryStyle(String style) {
 		_widgetHelper.setSecondaryStyle(this, style);
 	}
+
+
+
+  /* (non-Javadoc)
+   * @see com.gwtmobile.ui.client.widgets.TapClick#click()
+   */
+  @Override
+  public void click()
+  {
+
+    ClickEvent event = GWT.create(ClickEvent.class);
+
+    long now = System.currentTimeMillis();
+    if (now - _lastClick > 300) {
+      for (ClickHandler h : _handlers) {
+        h.onClick(event);
+      }
+      _lastClick = now;
+    }
+
+  }
 }

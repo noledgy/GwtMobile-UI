@@ -16,23 +16,24 @@
 
 package com.gwtmobile.ui.client.widgets;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtmobile.ui.client.CSS.StyleNames.Secondary;
 import com.gwtmobile.ui.client.event.TapRecognizer;
-import com.gwtmobile.ui.client.utils.Utils;
 import com.gwtmobile.ui.client.widgets.ListPanel.Chevron;
 
-public class ListItem extends PanelBase {
+public class ListItem extends PanelBase implements TapClick {
 
 	public enum ShowArrow { InheritFromParent, Visible, Hidden };
 	protected ShowArrow _displayArrow = ShowArrow.InheritFromParent;
 	protected boolean _enabled = true;
 	private TapRecognizer _tapRecognizer;
 	private HandlerRegistration _clickReg = null;
+	private ClickHandler handler = null;
+
 
 	public ListItem() {
 		// there is no named style role for list item.
@@ -43,7 +44,7 @@ public class ListItem extends PanelBase {
 	public void onLoad() {
 		super.onLoad();
 		if (null == _tapRecognizer) {
-			_tapRecognizer = new TapRecognizer(this, 40);
+			_tapRecognizer = new TapRecognizer(this, 40, this);
 		}
 	}
 
@@ -57,6 +58,7 @@ public class ListItem extends PanelBase {
 		if (null != _clickReg) {
 			_clickReg.removeHandler();
 			_clickReg = null;
+			handler = null;
 		}
 	}
 
@@ -128,6 +130,14 @@ public class ListItem extends PanelBase {
 	public void setClickHandler(ClickHandler handler) {
 		if (null != _clickReg && null != handler) _clickReg.removeHandler();
 		_clickReg = addDomHandler(handler, ClickEvent.getType());
+		this.handler = handler;
 	}
+
+  @Override
+  public void click()
+  {
+
+    handler.onClick((ClickEvent) GWT.create(ClickEvent.class));
+  }
 
 }

@@ -3,8 +3,6 @@ package com.gwtmobile.ui.client.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.dom.client.Touch;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.TouchCancelEvent;
 import com.google.gwt.event.dom.client.TouchCancelHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
@@ -14,9 +12,9 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtmobile.ui.client.utils.Utils;
+import com.gwtmobile.ui.client.widgets.TapClick;
 
 /**
  * @author kevindeem
@@ -32,16 +30,19 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 	private int initialX = 0;
 	private int initialY = 0;
 	private int distance;
+	private TapClick tapClick;
+
 	boolean touchCancelled = false;
 
 
-	public TapRecognizer(Widget source, int distance) {
+	public TapRecognizer(Widget source, int distance, TapClick tapClick) {
 		if (source == null)
 			throw new IllegalArgumentException("source can not be null");
 		if (distance < 0)
 			throw new IllegalArgumentException("distance has to be greater than zero");
 		this.source = source;
 		this.distance = distance;
+		this.tapClick = tapClick;
 		registrations.add(source.addDomHandler(this, TouchStartEvent.getType()));
 		registrations.add(source.addDomHandler(this, TouchMoveEvent.getType()));
 		registrations.add(source.addDomHandler(this, TouchCancelEvent.getType()));
@@ -55,10 +56,6 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		touchCancelled = false;
 		initialX = event.getNativeEvent().getClientX();
 		initialY = event.getNativeEvent().getClientY();
-		//Touch touch = event.getTouches().get(0);
-		//initialX = touch.getClientX();
-		//initialY = touch.getClientY();
-		//Utils.Console("touch start in tap recognizer");
 	}
 
 	@Override
@@ -66,28 +63,22 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 		if (initialX == 0 && initialY == 0) {
 			initialX = event.getNativeEvent().getClientX();
 			initialY = event.getNativeEvent().getClientY();
-//			Touch touch = event.getTouches().get(0);
-//			initialX = touch.getClientX();
-//			initialY = touch.getClientY();
 		}
-		//Utils.Console("touch move in tap recognizer");
 	}
 
 	@Override
 	public void onTouchEnd(TouchEndEvent event) {
-		Touch touch = event.getTouches().get(0);
 		int x = event.getNativeEvent().getClientX();
 		int y = event.getNativeEvent().getClientY();
-//		int x = touch.getClientX();
-//		int y = touch.getClientY();
 		if (!touchCancelled
 				&& Math.abs(x - initialX) < distance
 				&& Math.abs(y - initialY) < distance
 				&& null != source) {
-			fireClick(source.getElement());
+		  event.stopPropagation();
+		  tapClick.click();
+		  Utils.Console("TapClick");
 		}
 		initialX = initialY = 0;
-		//Utils.Console("touch end in tap recognizer");
 	}
 
 
@@ -96,13 +87,13 @@ public class TapRecognizer implements TouchStartHandler, TouchCancelHandler, Tou
 	public void onTouchCancel(TouchCancelEvent event) {
 		touchCancelled = true;
 		initialX = initialY = 0;
-		//Utils.Console("touch cancel in tap recognizer");
 	}
 
-	public static native void fireClick(Element element) /*-{
-		element.click();
-		//$wnd.console("");
-	}-*/;
+//	@SuppressWarnings("deprecation")
+//  public static native void fireClick(Element element) /*-{
+//		element.click();
+//		//$wnd.console("");
+//	}-*/;
 
 
 	@Override
