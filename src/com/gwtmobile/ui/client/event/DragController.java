@@ -16,7 +16,6 @@
 
 package com.gwtmobile.ui.client.event;
 
-import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +52,8 @@ public abstract class DragController implements EventListener {
     protected JavaScriptObject _dragMoveListener;
     protected JavaScriptObject _dragEndListener;
 
-	private static DragController INSTANCE = Beans.isDesignTime() ?
+	private static DragController INSTANCE =
+	    Utils.isDesktop() ? // Beans.isDesignTime() ?
 			new DragControllerDesktop() : 	(DragController)GWT.create(DragController.class);
 
 	DragController() {
@@ -89,6 +89,7 @@ public abstract class DragController implements EventListener {
 	@Override
     public void onBrowserEvent(Event e) {
         String type = e.getType();
+//        Utils.Console("Event type: " + type);
         if (type.equals("click")) {
             onClick(e);
         }
@@ -96,7 +97,7 @@ public abstract class DragController implements EventListener {
 
     private void onClick(Event e) {
         if (_suppressNextClick || Page.isInTransition()) {
-            e.stopPropagation();
+//            e.stopPropagation();
             _suppressNextClick = false;
             //Utils.Console("click suppressed");
         }

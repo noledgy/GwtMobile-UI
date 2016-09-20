@@ -20,6 +20,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.gwtmobile.ui.client.CSS.StyleNames.Primary;
 import com.gwtmobile.ui.client.page.PageHistory;
+import com.gwtmobile.ui.client.utils.Utils;
 
 public class BackButton extends Button implements ClickHandler {
 
@@ -42,7 +43,11 @@ public class BackButton extends Button implements ClickHandler {
     public void setHTML(String html) {
     	//FIXME: does mark-up belong in code?
 //    	super.setHTML("<i class=\"icon-back Pointer\"></i>" + "<span class=\"" + Primary.Button + "\">" + html + "</span>");
-      super.setHTML("<i class=\"icon-back Pointer\"></i>" + "<span>" + html + "</span>");
+      if (Utils.isAndroid())
+        super.setHTML("<i class=\"icon-android-back Pointer\"></i>");
+      else
+        super.setHTML("<i class=\"icon-back Pointer\"></i>" + "<span>" + html + "</span>");
+
     }
 
     public void setReturnParameter(Object parameter) {

@@ -17,6 +17,7 @@
 
 package com.gwtmobile.ui.client.page;
 
+import java.util.Iterator;
 import java.util.Stack;
 
 import com.google.gwt.dom.client.Element;
@@ -166,13 +167,20 @@ public class SerialPageHistory implements PageHistory {
    */
   public Page getHomePageAndClearStack() {
 
+
+
     if (false == _history.empty()) {
+      Utils.Console("Clearing page stack");
+      Iterator<Page> it = _history.iterator();
+      while (it.hasNext())
+        Utils.Console(it.next().getClass().getCanonicalName());
       Page page = _history.firstElement();
       _history.clear();
       return page;
 
     }
     else {
+      Utils.Console("Page stack empty");
       return null;
     }
   }

@@ -18,10 +18,10 @@ package com.gwtmobile.ui.client.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 
 public class Utils {
 
-	public static native void Console(String msg) /*-{
+  public static native void Console(String msg) /*-{
 //		if ($wnd.console) {
 //			$wnd.console.log(msg);
 //		}
@@ -109,12 +109,15 @@ public class Utils {
     	if (null != version) {
     		String[] bits = version.split("\\.");
 
-			if (bits.length == 3) {
+    	Console("getAndroidVersionValues: " + bits);
+			if (null != bits && bits.length == 3) {
 				try {
 					int[] rv = { Integer.parseInt(bits[0]),
-							Integer.parseInt(bits[1]), Integer.parseInt(bits[2]) };
+							         Integer.parseInt(bits[1]),
+							         Integer.parseInt(bits[2]) };
 					return rv;
 				} catch (NumberFormatException e) {
+		      Console("getAndroidVersionValues exception: " + e);
 					return null;
 				}
     		}
@@ -133,9 +136,39 @@ public class Utils {
     		(ind = ua.indexOf(android)) > -1) {
     		String version = ua.substring(ind + android.length());
     		version = version.substring(0,version.indexOf(";")).trim();
+    		Console("getAndroidVersion: " + version);
     		return version;
     	}
     	return null;
+    }
+
+    /**
+     * Checks if is android ver higher than.
+     *
+     * @param version the version
+     * @return true, if is android version at least the passed value
+     */
+    public static boolean isAndroidVerAtLeast(int version)
+    {
+
+      if (false == isAndroid())
+        return false;
+      Integer curVersion = getAndroidMajorVersion();
+      Console("Android versionX: " + (null != curVersion ? curVersion : "None"));
+      if (null != curVersion)
+        return curVersion >= version;
+        else
+          return false;
+    }
+
+    public static Integer getAndroidMajorVersion()
+    {
+
+      int[] versions = getAndroidVersionValues();
+      if (null != versions)
+        return versions[0];
+        else
+          return null;
     }
 
     public static boolean isMobileChrome() {
@@ -227,9 +260,7 @@ public class Utils {
             	return -1;
             }
         }
-        int index = DOM.getChildIndex(
-        		(com.google.gwt.user.client.Element)parent,
-        		(com.google.gwt.user.client.Element)div);
+        int index = DOM.getChildIndex(parent, div);
         return index;
     }
 

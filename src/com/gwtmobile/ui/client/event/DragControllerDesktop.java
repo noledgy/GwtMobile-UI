@@ -26,6 +26,7 @@ import com.gwtmobile.ui.client.utils.Utils;
 public class DragControllerDesktop extends DragController {
 
     DragControllerDesktop() {
+      Utils.Console("DragControllerDesktop");
     }
 
     @Override
@@ -98,4 +99,20 @@ public class DragControllerDesktop extends DragController {
 	        super.onBrowserEvent(e);
 		}
 	}
+
+  @Override
+  protected void onStart(Event e, Point p) {
+    Utils.Console("onStart");
+  }
+
+  @Override
+  protected void onMove(Event e, Point p) {
+    Utils.Console("onMove");
+  }
+
+  @Override
+  protected void onEnd(Event e, Point p) {
+    Utils.Console("onEnd");
+  }
+
 }

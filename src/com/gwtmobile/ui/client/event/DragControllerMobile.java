@@ -34,6 +34,7 @@ public class DragControllerMobile extends DragController {
 
 
     DragControllerMobile() {
+//      Utils.Console("New DragController instance created");
 		String agent = Window.Navigator.getUserAgent();
     	if (agent.contains("Android 5.")) {
     		_stopPropagation = false;
@@ -134,6 +135,7 @@ public class DragControllerMobile extends DragController {
 	@Override
     public void onBrowserEvent(Event e) {
 		String type = e.getType();
+//    Utils.Console("Event type: " + type);
 		if (type.equals("touchstart")) {
 			onTouchStart((TouchEvent)e);
 		}
@@ -142,6 +144,12 @@ public class DragControllerMobile extends DragController {
 		}
 		else if (type.equals("touchend")) {
 			onTouchEnd((TouchEvent)e);
+		}
+		else if (type.equals("click")) {
+//	    Utils.Console("Android version: " + Utils.getAndroidMajorVersion());
+      if (_touchTarget != null) {
+        onEnd(e, new Point(e.getClientX(), e.getClientY()));
+      }
 		}
 		else {
 		    super.onBrowserEvent(e);
@@ -154,8 +162,9 @@ public class DragControllerMobile extends DragController {
 	 * @author Frank Mena
 	 */
 	public void setStopPropagation() {
-		String agent = Window.Navigator.getUserAgent();
-		if (agent.contains("Android 5.")) {
+
+    if (Utils.isAndroidVerAtLeast(5)) {
+//		if (agent.contains("Android 6.")) {
 			_stopPropagation = false;
 		} else {
 			_stopPropagation = true;

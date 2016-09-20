@@ -15,20 +15,20 @@ public class TabHeaderPanel extends PanelBase {
 	public TabHeaderPanel(){
 		setStyleName(Primary.TabHeaderPanel);
 	}
-	
+
     @Override
     public void add(Widget w) {
-    
-    	if (w instanceof TabHeader 
+
+    	if (w instanceof TabHeader
     		|| isDesignTimeEmptyLabel(w)) {
     		super.add(w);
     		return;
     	} else {
     		assert false : "TabHeaderPanel can only contain TabHeader widgets.";
     	}
-    	
+
     }
-    
+
     public int getClickedTabHeaderIndex(ClickEvent e) {
         Element div = Element.as(e.getNativeEvent().getEventTarget());
         if (div == this.getElement()) {
@@ -38,12 +38,10 @@ public class TabHeaderPanel extends PanelBase {
         while (div.getParentElement() != this.getElement()) {
             div = div.getParentElement();
         }
-        int index = DOM.getChildIndex(
-        		(com.google.gwt.user.client.Element)this.getElement(), 
-        		(com.google.gwt.user.client.Element)div);
+        int index = DOM.getChildIndex(this.getElement(), div);
         return index;
     }
-    
+
     public void selectHeader(int index) {
     	if (getWidgetCount() > index) {
 	    	TabHeader header = (TabHeader) getWidget(index);
@@ -58,10 +56,10 @@ public class TabHeaderPanel extends PanelBase {
 	    	header.removeStyleName(Secondary.Selected);
     	}
     }
-    
+
     @Override
     protected String getDesignTimeMessage() {
     	return "Add TabHeader widgets.";
     }
-	
+
 }
