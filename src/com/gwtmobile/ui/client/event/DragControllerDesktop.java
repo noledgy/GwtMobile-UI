@@ -31,23 +31,35 @@ public class DragControllerDesktop extends DragController {
 
     @Override
     protected void registerEvents() {
-        super.registerEvents();
-        if (_dragStartListener == null) {
-            _dragStartListener = Utils.addEventListener(_source.getElement(), "mousedown", true, this);
-            _dragMoveListener = Utils.addEventListener(_source.getElement(), "mousemove", true, this);
-            _dragEndListener = Utils.addEventListener(_source.getElement(), "mouseup", true, this);
-        }
+      if (_clickListener == null) {
+        Utils.Console("DragControllerDesktop registerEvents");
+        _clickListener = Utils.addEventListener(_source.getElement(), "click", true, this);
+      }
+//        super.registerEvents();
+//        if (_dragStartListener == null) {
+//            _dragStartListener = Utils.addEventListener(_source.getElement(), "mousedown", true, this);
+//            _dragMoveListener = Utils.addEventListener(_source.getElement(), "mousemove", true, this);
+//            _dragEndListener = Utils.addEventListener(_source.getElement(), "mouseup", true, this);
+//        }
     }
 
     @Override
     protected void unregisterEvents() {
-        super.unregisterEvents();
-        if (_dragStartListener != null) {
-            Utils.removeEventListener(_source.getElement(), "mousedown", true, _dragStartListener);
-            Utils.removeEventListener(_source.getElement(), "mousemove", true, _dragMoveListener);
-            Utils.removeEventListener(_source.getElement(), "mouseup", true, _dragEndListener);
-            _dragStartListener = _dragMoveListener = _dragEndListener = null;
+      if (_clickListener != null) {
+        if (_clickListener == null) {
+          Utils.Console("DragControllerDesktop unregisterEvents");
+          _clickListener = Utils.addEventListener(_source.getElement(), "click", true, this);
         }
+        Utils.removeEventListener(_source.getElement(), "click", true, _clickListener);
+        _clickListener = null;
+      }
+//        super.unregisterEvents();
+//        if (_dragStartListener != null) {
+//            Utils.removeEventListener(_source.getElement(), "mousedown", true, _dragStartListener);
+//            Utils.removeEventListener(_source.getElement(), "mousemove", true, _dragMoveListener);
+//            Utils.removeEventListener(_source.getElement(), "mouseup", true, _dragEndListener);
+//            _dragStartListener = _dragMoveListener = _dragEndListener = null;
+//        }
     }
 
 
@@ -95,24 +107,24 @@ public class DragControllerDesktop extends DragController {
 		else if (type.equals("mouseup")) {
 			onMouseUp(e);
 		}
-		else {
-	        super.onBrowserEvent(e);
-		}
+//		else {
+//	        super.onBrowserEvent(e);
+//		}
 	}
 
   @Override
   protected void onStart(Event e, Point p) {
-    Utils.Console("onStart");
+//    Utils.Console("DragControllerDesktop onStart");
   }
 
   @Override
   protected void onMove(Event e, Point p) {
-    Utils.Console("onMove");
+//    Utils.Console("DragControllerDesktop onMove");
   }
 
   @Override
   protected void onEnd(Event e, Point p) {
-    Utils.Console("onEnd");
+//    Utils.Console("DragControllerDesktop onEnd");
   }
 
 }

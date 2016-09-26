@@ -16,10 +16,11 @@
 
 package com.gwtmobile.ui.client.event;
 
+import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Window;
 import com.gwtmobile.ui.client.utils.Point;
 import com.gwtmobile.ui.client.utils.Utils;
 
@@ -35,8 +36,9 @@ public class DragControllerMobile extends DragController {
 
     DragControllerMobile() {
 //      Utils.Console("New DragController instance created");
-		String agent = Window.Navigator.getUserAgent();
-    	if (agent.contains("Android 5.")) {
+//		String agent = Window.Navigator.getUserAgent();
+		  if (Utils.isAndroidVerAtLeast(5)) {
+//    	if (agent.contains("Android 5.")) {
     		_stopPropagation = false;
     	}
     }
@@ -74,14 +76,21 @@ public class DragControllerMobile extends DragController {
                 preventDefault = false;
             }
             _touchTarget = ele;
+            NodeList<Element> nodes = ele.getElementsByTagName(ButtonElement.TAG);
+            if (null != nodes && nodes.getLength() > 0) {
+              Utils.Console("onTouchStart FOUND A BUTTON!");
+              _touchTarget = nodes.getItem(0);
+            }
         }
         else {
+//          Utils.Console("DragController.onTouchStart not element: " + target);
+
         	_touchTarget = null;
         }
         //Utils.Console("Drag Controller Start");
 
         if (preventDefault && _stopPropagation) {
-			//Utils.Console("Drag controller Start Propogation Stop");
+//          Utils.Console("onTouchStart stopPropagation");
             e.preventDefault();   //prevent default action of selecting text
             e.stopPropagation();
         }
@@ -92,7 +101,7 @@ public class DragControllerMobile extends DragController {
 	public void onTouchMove(TouchEvent e) {
         //Utils.Console("Drag Controller Move");
 		if (_stopPropagation) {
-			//Utils.Console("Drag controller Move Propogation Stop");
+//			Utils.Console("onTouchMove stopPropagation");
 			e.preventDefault();
 			e.stopPropagation();
 		}
@@ -110,7 +119,8 @@ public class DragControllerMobile extends DragController {
 
 	public void onTouchEnd(TouchEvent e) {
 		if (_stopPropagation) {
-			//Utils.Console("Drag controller End Propogation Stop");
+//      Utils.Console("onTouchEnd stopPropagation");
+//			Utils.Console("Drag controller End Propagation Stop");
 			e.preventDefault();
 			e.stopPropagation();
 		}
@@ -119,23 +129,30 @@ public class DragControllerMobile extends DragController {
 		double deltaY = Math.abs(e.getScreenY() - _initialDragPos.Y());
 		_touchMoving = deltaX > touchMovementThreshold || deltaY
 				> touchMovementThreshold;
-		if (!_touchMoving) {
-			//Utils.Console("Drag Controller fireclick ");
+		if (!_touchMoving && true) {
+//			Utils.Console("DragController.onTouchEnd fireclick target=" + _touchTarget.getInnerHTML());
 			if (_touchTarget != null) {
 				fireClick(_touchTarget);
+			}
+			else {
+//	      Utils.Console("DragController.onTouchEnd _touchTarget is null");
 			}
 		}// else {
 			//Utils.Console("Drag Controller move end ");
 		//}
+//    Utils.Console("onTouchEnd: Calling onEnd()");
 		onEnd(e, new Point(e.changedTouches().get(0).getClientX(), e.changedTouches().get(0).getClientY()));
 		_touchMoving = false;
 		_initialDragPos = new Point(0,0);
 	}
 
+
+
 	@Override
     public void onBrowserEvent(Event e) {
+
 		String type = e.getType();
-//    Utils.Console("Event type: " + type);
+//    Utils.Console("EventC4 type: " + type);
 		if (type.equals("touchstart")) {
 			onTouchStart((TouchEvent)e);
 		}
@@ -144,12 +161,6 @@ public class DragControllerMobile extends DragController {
 		}
 		else if (type.equals("touchend")) {
 			onTouchEnd((TouchEvent)e);
-		}
-		else if (type.equals("click")) {
-//	    Utils.Console("Android version: " + Utils.getAndroidMajorVersion());
-      if (_touchTarget != null) {
-        onEnd(e, new Point(e.getClientX(), e.getClientY()));
-      }
 		}
 		else {
 		    super.onBrowserEvent(e);
@@ -178,6 +189,8 @@ public class DragControllerMobile extends DragController {
 	protected native void fireClick(Element theTarget) /*-{
 
 		// http://stackoverflow.com/questions/7184573/pick-up-the-android-version-in-the-browser-by-javascript
+//    $wnd.console.log("fireClick: start " + theTarget.innerHTML);
+
 		var ua = $wnd.navigator.userAgent;
 		if (ua.indexOf("Android") >= 0) {
 			var androidversion = parseFloat(ua.slice(ua.indexOf("Android") + 8));
@@ -190,18 +203,19 @@ public class DragControllerMobile extends DragController {
 				var lastMillis = this.@com.gwtmobile.ui.client.event.DragControllerMobile::_lastClickMillis;
 				if ((currMillis - lastMillis) < 50) {
 					this.@com.gwtmobile.ui.client.event.DragControllerMobile::_lastClickMillis = currMillis;
+//          $wnd.console.log("fireClick: suppressing for android > 4.1");
 					return;
 				}
 			}
 		}
 
-		if (theTarget.nodeType == 3)
-			theTarget = theTarget.parentNode;
+//		if (theTarget.nodeType == 3)
+//			theTarget = theTarget.parentNode;
 
 		var theEvent = $doc.createEvent('MouseEvents');
 		theEvent.initEvent('click', true, true);
 		theTarget.dispatchEvent(theEvent);
-		//$wnd.console.log("firing generated click");
+//    $wnd.console.log("fireClick: fired generated click");
 	}-*/;
 
 }

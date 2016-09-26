@@ -16,6 +16,7 @@
 
 package com.gwtmobile.ui.client.event;
 
+import java.beans.Beans;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,14 +47,15 @@ public abstract class DragController implements EventListener {
 	private Point _lastDragPos = new Point(0, 0);
 	private long _currDragTimeStamp = 0;
 	private Point _currDragPos = new Point(0, 0);
+	private Point _startDragPos = new Point(0, 0);
 
-	private JavaScriptObject _clickListener;
+	  protected JavaScriptObject _clickListener;
     protected JavaScriptObject _dragStartListener;
     protected JavaScriptObject _dragMoveListener;
     protected JavaScriptObject _dragEndListener;
 
 	private static DragController INSTANCE =
-	    Utils.isDesktop() ? // Beans.isDesignTime() ?
+	    Beans.isDesignTime() || Utils.isDesktop() ? // Beans.isDesignTime() ?
 			new DragControllerDesktop() : 	(DragController)GWT.create(DragController.class);
 
 	DragController() {
@@ -89,7 +91,7 @@ public abstract class DragController implements EventListener {
 	@Override
     public void onBrowserEvent(Event e) {
         String type = e.getType();
-//        Utils.Console("Event type: " + type);
+//        Utils.Console("EventP1x type: " + type);
         if (type.equals("click")) {
             onClick(e);
         }
@@ -97,9 +99,9 @@ public abstract class DragController implements EventListener {
 
     private void onClick(Event e) {
         if (_suppressNextClick || Page.isInTransition()) {
-//            e.stopPropagation();
+            e.stopPropagation();
             _suppressNextClick = false;
-            //Utils.Console("click suppressed");
+//            Utils.Console("onClick: click suppressed");
         }
     }
 
@@ -113,6 +115,7 @@ public abstract class DragController implements EventListener {
         _currDragTimeStamp = _lastDragTimeStamp;
         _lastDragPos.clone(p);
         _currDragPos.clone(p);
+        _startDragPos.clone(p);
         DragEvent dragEvent = new DragEvent(e, DragEvent.Type.Start,
                 p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());
         fireDragEvent(dragEvent);
@@ -125,7 +128,14 @@ public abstract class DragController implements EventListener {
                 Utils.Console("NO movement onMove");
                 return;
             }
-            _suppressNextClick = true;
+            double distanceX = p.X() - _startDragPos.X();
+            double distanceY = p.Y() - _startDragPos.Y();
+            Utils.Console("onMove distanceX:" + distanceX + "  distanceY:" + distanceY);
+            if (   Math.abs(distanceX) > 20
+                || Math.abs(distanceY) > 20) {
+              Utils.Console("onMove _suppressNextClick");
+              _suppressNextClick = true;
+            }
             DragEvent dragEvent = new DragEvent(e, DragEvent.Type.Move,
                     p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());
             fireDragEvent(dragEvent);
@@ -139,6 +149,7 @@ public abstract class DragController implements EventListener {
 
     protected void onEnd(Event e, Point p) {
         if (_isDown) {
+//            Utils.Console("DragController:onEnd: _isDown");
             _isDown = false;
             DragEvent dragEvent = new DragEvent(e, DragEvent.Type.End,
                     p.X(), p.Y(), p.X() - _currDragPos.X(), p.Y() - _currDragPos.Y());
@@ -167,6 +178,7 @@ public abstract class DragController implements EventListener {
             if (Math.abs(speed) > 0.2)
             {
                 SwipeEvent swipeEvent = new SwipeEvent(e, swipeType, speed);
+//                Utils.Console("DragController:onEnd: fireSwipeEvent");
                 fireSwipeEvent(swipeEvent);
             }
         }
@@ -238,12 +250,14 @@ public abstract class DragController implements EventListener {
 
     protected void registerEvents() {
         if (_clickListener == null) {
+//          Utils.Console("DragController registerEvents");
             _clickListener = Utils.addEventListener(_source.getElement(), "click", true, this);
         }
     }
 
     protected void unregisterEvents() {
         if (_clickListener != null) {
+//          Utils.Console("DragController unregisterEvents");
             Utils.removeEventListener(_source.getElement(), "click", true, _clickListener);
             _clickListener = null;
         }

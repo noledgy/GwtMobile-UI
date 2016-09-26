@@ -46,7 +46,7 @@ public class BackButton extends Button implements ClickHandler {
       if (Utils.isAndroid())
         super.setHTML("<i class=\"icon-android-back Pointer\"></i>");
       else
-        super.setHTML("<i class=\"icon-back Pointer\"></i>" + "<span>" + html + "</span>");
+        super.setHTML("<span><i class=\"icon-back Pointer\"></i>" + "<span>" + html + "</span></span>");
 
     }
 

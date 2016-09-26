@@ -133,11 +133,18 @@ public class ListItem extends PanelBase implements TapClick {
 		this.handler = handler;
 	}
 
-  @Override
+//  @Override
   public void click()
   {
 
     handler.onClick((ClickEvent) GWT.create(ClickEvent.class));
+  }
+
+  @Override
+  public void click(ClickEvent event)
+  {
+
+    handler.onClick(event);
   }
 
 }

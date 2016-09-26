@@ -40,6 +40,9 @@ public class HeaderPanel extends PanelBase {
       contents    = new FlowPanel();
       rightButton = new SimplePanel();
 
+      leftButton.setHeight("100%");
+      rightButton.setHeight("100%");
+
     	super.add(leftButton);	//left button placeholder
     	super.add(new SimplePanel()); // left spacer
     	super.add(contents);		//contents
@@ -84,18 +87,20 @@ public class HeaderPanel extends PanelBase {
 
     public void setLeftButton(String buttonName) {
     	if (!buttonName.isEmpty()) {
-        	ClickHandler clickHandler = new ClickHandler() {
-    			@Override
-    			public void onClick(ClickEvent event) {
-    				onLeftButtonClick(event);
-    			}
-    		};
-        	if (buttonName.toUpperCase().equals("BACK")) {
-        		leftButton.setWidget(new BackButton(buttonName, clickHandler));
-        	}
-        	else {
-        		leftButton.setWidget(new HeaderButton(buttonName, clickHandler));
-        	}
+        ClickHandler clickHandler = new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+              event.stopPropagation();
+              onLeftButtonClick(event);
+          }
+  		};
+    	if (buttonName.toUpperCase().equals("BACK")) {
+    		leftButton.setWidget(new BackButton(buttonName, clickHandler));
+    	}
+    	else {
+    	  leftButton.setWidget(new HeaderButton(buttonName, clickHandler));
+    	}
+        rightButton.addDomHandler(clickHandler, ClickEvent.getType());
     	}
     }
 
@@ -114,20 +119,23 @@ public class HeaderPanel extends PanelBase {
         ClickHandler clickHandler = new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
+            event.stopPropagation();
             onLeftButtonClick(event);
           }
         };
       leftButton.setWidget(new BackButton(buttonName, clickHandler));
+      leftButton.addDomHandler(clickHandler, ClickEvent.getType());
       }
     }
 
     public void setRightButton(String buttonName) {
     	if (!buttonName.isEmpty()) {
-        	ClickHandler clickHandler = new ClickHandler() {
-    			@Override
-    			public void onClick(ClickEvent event) {
-    				onRightButtonClick(event);
-    			}
+          ClickHandler clickHandler = new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            event.stopPropagation();
+            onRightButtonClick(event);
+          }
     		};
         	if (buttonName.toUpperCase().equals("NEXT")) {
         		rightButton.setWidget(new NextButton(buttonName, clickHandler));
@@ -135,6 +143,7 @@ public class HeaderPanel extends PanelBase {
         	else {
         		rightButton.setWidget(new HeaderButton(buttonName, clickHandler));
         	}
+        	rightButton.addDomHandler(clickHandler, ClickEvent.getType());
     	}
     }
 

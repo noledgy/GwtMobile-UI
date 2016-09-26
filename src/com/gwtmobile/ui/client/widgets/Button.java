@@ -19,7 +19,6 @@ package com.gwtmobile.ui.client.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -161,10 +160,10 @@ public class Button extends HTML implements DragEventsHandler, IsGwtMobileWidget
    * @see com.gwtmobile.ui.client.widgets.TapClick#click()
    */
   @Override
-  public void click()
+  public void click(ClickEvent event)
   {
 
-    ClickEvent event = GWT.create(ClickEvent.class);
+//    ClickEvent event = GWT.create(ClickEvent.class);
 
     long now = System.currentTimeMillis();
     if (now - _lastClick > 300) {

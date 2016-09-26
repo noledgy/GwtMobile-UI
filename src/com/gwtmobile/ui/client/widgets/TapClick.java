@@ -6,6 +6,8 @@
  */
 package com.gwtmobile.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+
 
 
 
@@ -16,5 +18,5 @@ package com.gwtmobile.ui.client.widgets;
 public interface TapClick
 {
 
-  public void click();
+  public void click(ClickEvent event);
 }

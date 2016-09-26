@@ -30,7 +30,7 @@ import com.gwtmobile.ui.client.event.SelectionChangedEvent;
 import com.gwtmobile.ui.client.event.SelectionChangedHandler;
 import com.gwtmobile.ui.client.utils.Utils;
 
-public class ListPanel extends PanelBase implements ClickHandler, DragEventsHandler{
+public class ListPanel extends PanelBase implements ClickHandler, DragEventsHandler {
 
     public enum ShowArrow { Visible, Hidden };
     private ShowArrow _showArrow;
@@ -39,6 +39,12 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
     private double _initialX = 0.0;
     private double _initialY = 0.0;
     private long _lastClick = 0l;
+
+    interface Handler {
+
+      public void onClick(ListItem item);
+    }
+
 
     public ListPanel() {
         //addDomHandler(this, ClickEvent.getType());
@@ -90,6 +96,9 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
         else {
             ListItem listItem = new ListItem();
             super.add(listItem);
+
+            listItem.setClickHandler(this);
+
             listItem.add(w);
             if (_showArrow == ShowArrow.Visible) {
                 Chevron chevron = new Chevron();
@@ -103,11 +112,14 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
      */
     @Override
     public void onClick(ClickEvent e) {
+
+//      Utils.Console("ListPanel:onClick source=" + e.getSource());
         // this version of on click gets triggered by items being touched.
         long milis = System.currentTimeMillis();
         if (_lastClick > 0l && milis - _lastClick < 40) {
             return;
         }
+//        Utils.Console("ListPanel:onClick passed timer");
         _lastClick = milis;
         _selected = getChildren().indexOf((Widget)e.getSource());
         if (_selected >= 0) {
@@ -121,7 +133,7 @@ public class ListPanel extends PanelBase implements ClickHandler, DragEventsHand
             }
             _selected = -1;
         } else {
-            //Utils.Console("Recieved Click Event for non item");
+//            Utils.Console("Received Click Event for non item: selected = " + _selected);
         }
     }
 
